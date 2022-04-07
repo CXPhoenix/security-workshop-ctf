@@ -1,74 +1,79 @@
 import "../src/index.css";
+import disableDevtool from "disable-devtool";
 
-const demoData = [
-  {
-    message: "哈...終於做好了",
-    timestamp: new Date("2022/04/05 12:00:00"),
-  },
-  {
-    message: "差點就被 crack 了...",
-    timestamp: new Date("2022/04/06 17:28:32"),
-  },
-  {
-    message: "希望不會太糟糕😣😣😣",
-    timestamp: new Date("2022/04/07 03:24:43"),
-  },
-];
+// disableDevtool({
+//   url: "https://letmegooglethat.com/",
+// });
+
+// const demoData = [
+//   {
+//     message: "哈...終於做好了",
+//     timestamp: new Date("2022/04/05 12:00:00"),
+//   },
+//   {
+//     message: "差點就被 crack 了...",
+//     timestamp: new Date("2022/04/06 17:28:32"),
+//   },
+//   {
+//     message: "希望不會太糟糕😣😣😣",
+//     timestamp: new Date("2022/04/07 03:24:43"),
+//   },
+// ];
 
 const url = new URL(
   "https://script.google.com/macros/s/AKfycbwO237ZLivxZ1ULM_j-S4gvHPVmAYywiugXIQBVYMD8jS424DDoGbuS-3B0NRcRu3mTuA/exec"
 );
 
-let token;
-
-if (!window.localStorage.getItem("token")) {
-  token = btoa(
-    `${new Date().getTime()}${navigator.userAgent}${
-      navigator.hardwareConcurrency
-    }`
-  );
-  window.localStorage.setItem("token", token);
-} else {
-  token = window.localStorage.getItem("token");
-}
-
 const form = document.querySelector("#leave-message-form");
 form.addEventListener("submit", (e) => {
   e.preventDefault();
+  document.querySelector("#loading-mask").classList.remove("hidden");
+  document.querySelector("#loading-mask").classList.add("flex");
   if (form["leave-message-area"].value === "") return;
   if (form["leave-message-area"].value.match(new RegExp("</?script>"))) {
     console.log("match");
   }
-  addMessageInClient(form["leave-message-area"].value, new Date());
-  demoData.push({
-    message: form["leave-message-area"].value,
-    timestamp: new Date(),
+  postMessageToBackend(
+    form["leave-message-area"].value,
+    new Date().getTime()
+  ).then((data) => {
+    clearMessages();
+    data.data.forEach((item) => {
+      addMessageInClient(item.message, item.timestamp, true);
+    });
+    document.querySelector("#loading-mask").classList.remove("flex");
+    document.querySelector("#loading-mask").classList.add("hidden");
   });
   form["leave-message-area"].value = "";
-  window.sessionStorage.setItem("messages", JSON.stringify(demoData));
+  // addMessageInClient(form["leave-message-area"].value, new Date());
+  // demoData.push({
+  //   message: form["leave-message-area"].value,
+  //   timestamp: new Date(),
+  // });
+  // window.sessionStorage.setItem("messages", JSON.stringify(demoData));
 });
 window.addEventListener("DOMContentLoaded", () => {
   form["leave-message-area"].focus();
-  if (!window.sessionStorage.getItem("messages")) {
-    // demoData.forEach((data) => {
-    //   addMessageInClient(data.message, data.timestamp);
-    // });
 
-    getDataFromBackend().then((data) => {
-      // console.log(data);
+  getDataFromBackend(window.localStorage.getItem("token") || "").then(
+    (data) => {
       data.data.forEach((item) => {
         addMessageInClient(item.message, item.timestamp);
       });
-    });
-    return;
-  }
-  // const messages = JSON.parse(window.sessionStorage.getItem("messages"));
-  // messages.forEach((data) => {
-  //   addMessageInClient(data.message, data.timestamp);
-  // });
+      if (!window.localStorage.getItem("token")) {
+        window.localStorage.setItem("token", data.token);
+      }
+      document.querySelector("#loading-mask").classList.add("hidden");
+      document.querySelector("#loading-mask").classList.remove("flex");
+    }
+  );
 });
 
-async function getDataFromBackend() {
+/**
+ * @async
+ * @returns {Object} {data: Object[]}
+ */
+async function getDataFromBackend(token = "") {
   const dataURL = url;
   dataURL.searchParams.append("type", "message-board");
   dataURL.searchParams.append("token", token);
@@ -82,15 +87,51 @@ async function getDataFromBackend() {
 /**
  *
  * @param {String} message
+ * @param {String} times getTime()
+ * @returns
+ */
+async function postMessageToBackend(message, times) {
+  const postUrl = url;
+  const headers = new Headers();
+  headers.append("Content-Type", "text/plain");
+  const fetchOptions = {
+    headers,
+    method: "POST",
+    body: JSON.stringify({
+      message: message,
+      timestamp: times,
+      token: window.localStorage.getItem("token"),
+      type: "message-board",
+    }),
+  };
+  try {
+    const res = await fetch(postUrl, fetchOptions);
+    const data = await res.json();
+    return data;
+  } catch {
+    console.log(e);
+  }
+}
+
+/**
+ *
+ * @param {String} message
  * @param {Date} timestamp
+ * @param {Boolean} isClearHistory
  */
 function addMessageInClient(message, timestamp) {
   const messageBox = document.querySelector("#message-box").content;
   const cloneMessageBox = messageBox.cloneNode(true);
   cloneMessageBox.querySelector("#message").innerHTML = message;
+  // cloneMessageBox.querySelector("#message").innerHTML = sanitizeHTML(message);
   cloneMessageBox.querySelector("#timestamp").innerText = formatDate(timestamp);
   const messages = document.querySelector("#messages");
   messages.insertBefore(cloneMessageBox, messages.firstElementChild);
+}
+
+function clearMessages() {
+  const messages = document.querySelector("#messages");
+  messages.innerHTML = "";
 }
 
 /**
@@ -116,4 +157,14 @@ function formatDate(date) {
  */
 function formatDigitalToStringStyle(num) {
   return num < 10 ? `0${num}` : `${num}`;
+}
+
+function sanitizeHTML(str) {
+  const temp = document.createElement("div");
+  temp.innerText = str;
+  return temp.innerHTML;
+}
+
+function alert(str) {
+  window.alert(str);
 }

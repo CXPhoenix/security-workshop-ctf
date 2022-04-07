@@ -6,6 +6,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="./images/fhshLOGO.png" />
     <title>Level 4</title>
+    <style>
+      .lds-facebook {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+      }
+      .lds-facebook div {
+        display: inline-block;
+        position: absolute;
+        left: 8px;
+        width: 16px;
+        background: #fff;
+        animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+      }
+      .lds-facebook div:nth-child(1) {
+        left: 8px;
+        animation-delay: -0.24s;
+      }
+      .lds-facebook div:nth-child(2) {
+        left: 32px;
+        animation-delay: -0.12s;
+      }
+      .lds-facebook div:nth-child(3) {
+        left: 56px;
+        animation-delay: 0;
+      }
+      @keyframes lds-facebook {
+        0% {
+          top: 8px;
+          height: 64px;
+        }
+        50%,
+        100% {
+          top: 24px;
+          height: 32px;
+        }
+      }
+    </style>
   </head>
   <body>
     <article class="w-screen space-y-10">
@@ -19,7 +58,7 @@
         <h2 class="text-3xl">請輸入留言</h2>
         <label
           for="leave-message-area"
-          class="flex w-full max-w-[1024px] items-center justify-between rounded-3xl border-2 border-gray-300 py-2 px-5"
+          class="flex w-full max-w-[1024px] items-center justify-between rounded-3xl border-2 border-gray-300 py-2 px-5 focus-within:shadow-lg hover:shadow-lg"
         >
           <span class="w-6 text-gray-400">
             <svg
@@ -61,6 +100,16 @@
         <p class="text-right text-sm" id="timestamp">{{timestamp}}</p>
       </div>
     </template>
+    <div
+      id="loading-mask"
+      class="fixed inset-0 z-10 flex h-screen w-screen items-center justify-center overflow-hidden bg-black/80"
+    >
+      <div class="lds-facebook">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
     <script src="./main.js" type="module"></script>
   </body>
 </html>

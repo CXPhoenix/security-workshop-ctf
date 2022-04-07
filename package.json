@@ -4,6 +4,7 @@
     "dev": "cross-env TAILWIND_MODE=watch vite",
     "build": "cross-env TAILWIND_MODE=build vite build",
     "build:dist": "cross-env TAILWIND_MODE=build vite build --base=/dist/",
+    "build:relative": "cross-env TAILWIND_MODE=build vite build --base=./",
     "serve": "vite preview"
   },
   "devDependencies": {
@@ -13,7 +14,8 @@
     "vite": "^2.4.4"
   },
   "dependencies": {
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "disable-devtool": "^0.2.5"
   },
   "name": "ctf"
 }

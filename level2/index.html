@@ -5,8 +5,97 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Level 2</title>
+    <style>
+      .lds-facebook {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+      }
+      .lds-facebook div {
+        display: inline-block;
+        position: absolute;
+        left: 8px;
+        width: 16px;
+        background: #fff;
+        animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+      }
+      .lds-facebook div:nth-child(1) {
+        left: 8px;
+        animation-delay: -0.24s;
+      }
+      .lds-facebook div:nth-child(2) {
+        left: 32px;
+        animation-delay: -0.12s;
+      }
+      .lds-facebook div:nth-child(3) {
+        left: 56px;
+        animation-delay: 0;
+      }
+      @keyframes lds-facebook {
+        0% {
+          top: 8px;
+          height: 64px;
+        }
+        50%,
+        100% {
+          top: 24px;
+          height: 32px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <script src="../src/main.js" type="module"></script>
+    <div class="flex h-screen w-screen items-center justify-center bg-black/60">
+      <form
+        id="sign-in-form"
+        class="flex w-full max-w-3xl flex-col items-center justify-center gap-8 rounded-lg bg-white py-5 px-10"
+      >
+        <h1 class="text-5xl font-bold">CTF 滲透登入</h1>
+        <label for="addr" class="w-full space-y-4">
+          <p class="text-center text-2xl font-medium">使用者帳號</p>
+          <input
+            type="text"
+            class="w-full rounded-md border-2 border-gray-200 p-3 pl-5 text-lg shadow-md outline-none hover:shadow-lg focus:shadow-lg"
+            name="addr"
+            id="addr"
+            placeholder="請輸入使用者帳號"
+            area-label="請輸入使用者帳號"
+            autocomplete="off"
+          />
+        </label>
+        <label for="pwd" class="w-full space-y-4">
+          <p class="text-center text-2xl font-medium">使用者密碼</p>
+          <input
+            type="password"
+            name="pwd"
+            class="w-full rounded-md border-2 border-gray-200 p-3 pl-5 text-lg shadow-md outline-none hover:shadow-lg focus:shadow-lg"
+            id="pwd"
+            placeholder="請輸入使用者密碼"
+            area-label="請輸入使用者密碼"
+            autocomplete="off"
+          />
+        </label>
+        <div class="w-full px-10 py-3 text-center">
+          <button
+            type="submit"
+            class="w-full rounded-lg border-2 border-green-700 bg-green-700 py-3 text-xl font-semibold text-white hover:bg-inherit hover:text-green-700"
+          >
+            登入
+          </button>
+        </div>
+      </form>
+    </div>
+    <div
+      id="loading-mask"
+      class="fixed inset-0 z-10 hidden h-screen w-screen items-center justify-center overflow-hidden bg-black/80"
+    >
+      <div class="lds-facebook">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+    <script src="./main.js" type="module"></script>
   </body>
 </html>
