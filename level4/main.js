@@ -15,11 +15,28 @@ const demoData = [
   },
 ];
 
+const url = new URL(
+  "https://script.google.com/macros/s/AKfycbwO237ZLivxZ1ULM_j-S4gvHPVmAYywiugXIQBVYMD8jS424DDoGbuS-3B0NRcRu3mTuA/exec"
+);
+
+let token;
+
+if (!window.localStorage.getItem("token")) {
+  token = btoa(
+    `${new Date().getTime()}${navigator.userAgent}${
+      navigator.hardwareConcurrency
+    }`
+  );
+  window.localStorage.setItem("token", token);
+} else {
+  token = window.localStorage.getItem("token");
+}
+
 const form = document.querySelector("#leave-message-form");
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   if (form["leave-message-area"].value === "") return;
-  if (form["leave-message-area"].value.match(new RegExp("^</?script>"))) {
+  if (form["leave-message-area"].value.match(new RegExp("</?script>"))) {
     console.log("match");
   }
   addMessageInClient(form["leave-message-area"].value, new Date());
@@ -33,16 +50,34 @@ form.addEventListener("submit", (e) => {
 window.addEventListener("DOMContentLoaded", () => {
   form["leave-message-area"].focus();
   if (!window.sessionStorage.getItem("messages")) {
-    demoData.forEach((data) => {
-      addMessageInClient(data.message, data.timestamp);
+    // demoData.forEach((data) => {
+    //   addMessageInClient(data.message, data.timestamp);
+    // });
+
+    getDataFromBackend().then((data) => {
+      // console.log(data);
+      data.data.forEach((item) => {
+        addMessageInClient(item.message, item.timestamp);
+      });
     });
     return;
   }
-  const messages = JSON.parse(window.sessionStorage.getItem("messages"));
-  messages.forEach((data) => {
-    addMessageInClient(data.message, data.timestamp);
-  });
+  // const messages = JSON.parse(window.sessionStorage.getItem("messages"));
+  // messages.forEach((data) => {
+  //   addMessageInClient(data.message, data.timestamp);
+  // });
 });
+
+async function getDataFromBackend() {
+  const dataURL = url;
+  dataURL.searchParams.append("type", "message-board");
+  dataURL.searchParams.append("token", token);
+  const headers = new Headers();
+  headers.append("Content-Type", "text/plain");
+  const res = await fetch(url, { headers, method: "GET" });
+  const data = await res.json();
+  return data;
+}
 
 /**
  *
