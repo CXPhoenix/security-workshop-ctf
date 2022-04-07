@@ -3,6 +3,7 @@ import disableDevtool from "disable-devtool";
 
 // disableDevtool({
 //   url: "https://letmegooglethat.com/",
+//   disableMenu: false,
 // });
 
 // const demoData = [
@@ -165,6 +166,13 @@ function sanitizeHTML(str) {
   return temp.innerHTML;
 }
 
-function alert(str) {
-  window.alert(str);
+async function getFlag() {
+  //get flag
+  const flagURI = new URL(
+    "https://script.google.com/macros/s/AKfycbwO237ZLivxZ1ULM_j-S4gvHPVmAYywiugXIQBVYMD8jS424DDoGbuS-3B0NRcRu3mTuA/exec"
+  );
+  flagURI.searchParams.append("level", "w04");
+  const res = await fetch(flagURI);
+  const data = await res.json();
+  return data;
 }
