@@ -18,6 +18,10 @@ const demoData = [
 const form = document.querySelector("#leave-message-form");
 form.addEventListener("submit", (e) => {
   e.preventDefault();
+  if (form["leave-message-area"].value === "") return;
+  if (form["leave-message-area"].value.match(new RegExp("^</?script>"))) {
+    console.log("match");
+  }
   addMessageInClient(form["leave-message-area"].value, new Date());
   demoData.push({
     message: form["leave-message-area"].value,
